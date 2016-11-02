@@ -3338,6 +3338,7 @@ ext/directfb/Makefile
 ext/wayland/Makefile
 ext/daala/Makefile
 ext/dts/Makefile
+ext/dtls/Makefile
 ext/gl/Makefile
 ext/faac/Makefile
 ext/faad/Makefile

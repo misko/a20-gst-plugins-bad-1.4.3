@@ -76,6 +76,8 @@ else
 DTS_DIR=
 endif
 
+DTLS_DIR=dtls
+
 if USE_GL
 GL_DIR=gl
 else
@@ -409,6 +411,7 @@ SUBDIRS=\
 	$(WAYLAND_DIR) \
 	$(DAALA_DIR) \
 	$(DTS_DIR) \
+	$(DTLS_DIR) \
 	$(RESINDVD_DIR) \
 	$(GL_DIR) \
 	$(FAAC_DIR) \
@@ -485,6 +488,7 @@ DIST_SUBDIRS = \
 	lv2 \
 	daala \
 	dts \
+	dtls \
 	gl \
 	modplug \
 	mimic \
