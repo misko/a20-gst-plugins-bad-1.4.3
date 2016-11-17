@@ -1018,6 +1018,67 @@ gst_motion_cells_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
         char *detectedmotioncells;
         filter->last_motion_timestamp = GST_BUFFER_TIMESTAMP (buf);
         detectedmotioncells = getMotionCellsIdx (filter->id);
+ 	float center_x = 0.0;
+	float center_y = 0.0;
+ 	int min_x = filter->gridx;
+	int min_y = filter->gridy;
+	int max_x = 0;
+	int max_y = 0;
+	int cells = 0;
+	//format is Y:X,...
+	char * s = detectedmotioncells;
+	while (*s!='\0') {
+		char buffer_x[16];
+		int buffer_x_idx=0;
+		char buffer_y[16];
+		int buffer_y_idx=0;
+		//first get the X
+		while (*s!='\0' && !isdigit(*s)) { s++; };
+		while (*s!='\0' && isdigit(*s)) { buffer_y[buffer_y_idx++]=*s; s++;};
+		buffer_y[buffer_y_idx]='\0';
+		while (*s!='\0' && !isdigit(*s)) { s++; };
+		while (*s!='\0' && isdigit(*s)) { buffer_x[buffer_x_idx++]=*s; s++; };
+		buffer_x[buffer_x_idx]='\0';
+		if (buffer_x_idx>0 && buffer_y_idx>0) {
+			int x = atoi(buffer_x);
+			int y = atoi(buffer_y);
+			if (x<min_x) {
+				min_x=x;
+			}
+			if (x>max_x) {
+				max_x=x;
+			}
+			if (y<min_y) {
+				min_y=y;
+			}
+			if (y>max_y) {
+				max_y=y;
+			}
+			center_x+=atof(buffer_x);
+			center_y+=atof(buffer_y);
+			
+			cells++;
+		}
+	}			
+	center_x/=cells*filter->gridx;
+	center_y/=cells*filter->gridy;
+	GstVideoCropMeta * meta = gst_buffer_add_video_crop_meta (buf);
+	if (min_x<=max_x && min_y<=max_y) {
+		if (meta!=NULL) {
+			//center mass
+			/*meta->x=(int)(filter->width*center_x);
+			  meta->y=(int)(filter->height*center_y);
+			  meta->width=0;
+			  meta->height=0;*/
+			int px_x = filter->width/filter->gridx;
+			int px_y = filter->height/filter->gridy;
+			meta->x = min_x*px_x;
+			meta->y = min_y*px_y;
+			meta->width = (max_x-min_x+1)*px_x;
+			meta->height = (max_y-min_y+1)*px_y;
+			fprintf(stderr,"MOTION SET CROP %d %d %d %d\n",meta->x,meta->y,meta->width,meta->height);
+		}
+	}
         if (detectedmotioncells) {
           filter->consecutive_motion++;
           if ((filter->previous_motion == FALSE)
