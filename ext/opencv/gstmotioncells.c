@@ -1070,6 +1070,18 @@ gst_motion_cells_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
 			  meta->y=(int)(filter->height*center_y);
 			  meta->width=0;
 			  meta->height=0;*/
+			if (min_x>0) {
+				min_x--;
+			}
+			if (min_y>0) {
+				min_y--;
+			}
+			if ((max_x+1)<filter->gridx) {
+				max_x++;
+			}
+			if ((max_y+1)<filter->gridy) {
+				max_y++;
+			}
 			int px_x = filter->width/filter->gridx;
 			int px_y = filter->height/filter->gridy;
 			meta->x = min_x*px_x;
